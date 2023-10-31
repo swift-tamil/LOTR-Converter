@@ -14,7 +14,11 @@ struct ContentView: View {
     @State private var silverCount: String = "";
     @State private var goldCount: String = "";
     
+    @State private var leftCurrency: Currency = .silverPeice;
+    @State private var rightCurrency: Currency = .goldPiece;
     
+    @State private var showSelectCurrency: Bool = false
+    @State private var showExchangeInfo: Bool = false
     
     //MARK: BODY
     var body: some View {
@@ -41,28 +45,35 @@ struct ContentView: View {
                         
                         HStack{
                             
-                            Image(.silverpiece)
+                            Image(CurrencyImage.allCases[Currency.allCases.firstIndex(of: leftCurrency)!].rawValue)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 33)
                             
-                            Text("Silver Piece")
+                            Text(CurrencyText.allCases[Currency.allCases.firstIndex(of: leftCurrency)!].rawValue)
                                 .foregroundColor(.white)
                                 .font(.headline)
                             
-                        } .padding(.bottom, -5)
+                        }
+                        .padding(.bottom, -5)
+                        .onTapGesture {
+                            showSelectCurrency.toggle()
+                        }
+                        .sheet(isPresented: $showSelectCurrency, content: {
+                            SelectCurrency(leftCurrency: $leftCurrency, rightCurrency: $rightCurrency)
+                        })
                         
                         TextField("Amount", text: $silverCount)
                             .padding(7)
                             .background(Color(UIColor.systemGray6))
                             .cornerRadius(7)
-                          
+                        
                     }
                     
                     Image(systemName: "equal")
                         .font(.largeTitle)
                         .foregroundColor(.white)
-                      
+                    
                     
                     //MARK: Gold Piece
                     
@@ -70,18 +81,18 @@ struct ContentView: View {
                         
                         HStack{
                             
-                            Text("Gold Piece")
+                            Text(CurrencyText.allCases[Currency.allCases.firstIndex(of: rightCurrency)!].rawValue)
                                 .foregroundColor(.white)
                                 .font(.headline)
                             
-                            Image(.goldpiece)
+                            Image(CurrencyImage.allCases[Currency.allCases.firstIndex(of: rightCurrency)!].rawValue)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 33)
                             
                         }
                         .padding(.bottom, -10)
-                       
+                        
                         
                         TextField("Amount", text: $goldCount)
                             .padding(7)
@@ -94,6 +105,12 @@ struct ContentView: View {
                 .padding()
                 .background(.black.opacity(0.5))
                 .cornerRadius(50)
+                .onTapGesture {
+                    showSelectCurrency.toggle()
+                }
+                .sheet(isPresented: $showSelectCurrency, content: {
+                    SelectCurrency(leftCurrency: $leftCurrency, rightCurrency: $rightCurrency)
+                })
                 
                 Spacer()
                 
@@ -103,18 +120,25 @@ struct ContentView: View {
                         
                         Spacer()
                         
-                        Image(systemName: "info.circle.fill")
-                            .foregroundColor(.white)
-                            .font(.largeTitle)
+                        Button(action: {
+                            showExchangeInfo.toggle()
+                        }, label: {
+                            Image(systemName: "info.circle.fill")
+                                .foregroundColor(.white)
+                                .font(.largeTitle)
+                        })
+                        .sheet(isPresented: $showExchangeInfo, content: {
+                            ExchangeInfo()
+                        })
                     }
                 }
             }
-          
+            
             
             
             
         }//:Body
-    
+        
     }
 }
 
